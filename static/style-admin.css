@@ -1,0 +1,187 @@
+:root {
+    --primary-color: #4361ee;
+    --secondary-color: #3f37c9;
+    --success-color: #4cc9f0;
+    --danger-color: #f72585;
+    --warning-color: #f8961e;
+    --info-color: #4895ef;
+    --light-color: #bababa;
+    --dark-color: #212529;
+  }
+  
+  body {
+    background-color: #c5c5c5;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  .card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  }
+  
+  .card-header {
+    border-radius: 12px 12px 0 0 !important;
+    font-weight: 600;
+  }
+  
+  .table {
+    margin-bottom: 0;
+  }
+  
+  .table th {
+    font-weight: 600;
+    color: var(--dark-color);
+    border-top: none;
+  }
+  
+  .badge {
+    font-weight: 500;
+    padding: 5px 10px;
+    border-radius: 8px;
+  }
+  
+  .btn {
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    padding: 8px 16px;
+  }
+  
+  .btn-sm {
+    padding: 5px 12px;
+  }
+  
+  /* Notificaciones */
+  .notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    min-width: 300px;
+    padding: 15px 20px;
+    border-radius: 10px;
+    color: rgb(221, 221, 221);
+    font-weight: 500;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    transform: translateX(150%);
+    transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    background-color: #4895ef;
+  }
+  
+  .notification.show {
+    transform: translateX(0);
+  }
+  
+  .notification.success {
+    background-color: var(--success-color);
+  }
+  
+  .notification.error {
+    background-color: var(--danger-color);
+  }
+  
+  .notification.warning {
+    background-color: var(--warning-color);
+  }
+  
+  .notification i {
+    margin-right: 10px;
+    font-size: 1.2rem;
+  }
+  
+  /* Modal mejorado */
+  .modal-content {
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  }
+  
+  .modal-header {
+    background-color: var(--primary-color);
+    color: white;
+    border-bottom: none;
+    padding: 20px;
+  }
+  
+  .modal-title {
+    font-weight: 600;
+  }
+  
+  .modal-body {
+    padding: 25px;
+  }
+  
+  .modal-footer {
+    border-top: none;
+    padding: 15px 25px;
+    background-color: #f8f9fa;
+  }
+  
+  .form-control, .form-select {
+    border-radius: 8px;
+    padding: 10px 15px;
+    border: 1px solid #e0e0e0;
+    transition: all 0.3s ease;
+  }
+  
+  .form-control:focus, .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
+  }
+  
+  /* Progress bar */
+  .progress {
+    height: 6px;
+    border-radius: 3px;
+    background-color: #e9ecef;
+  }
+  
+  .progress-bar {
+    transition: width 0.5s ease;
+  }
+  
+  /* Animaciones */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  .fade-in {
+    animation: fadeIn 0.5s ease forwards;
+  }
+  
+  /* Efecto hover para filas de tabla */
+  .table-hover tbody tr {
+    transition: all 0.2s ease;
+  }
+  
+  .table-hover tbody tr:hover {
+    background-color: rgba(67, 97, 238, 0.05);
+    transform: translateX(5px);
+  }
+  
+  /* Botón de actualizar */
+  .refresh-btn {
+    background: none;
+    border: none;
+    color: white;
+    transition: transform 0.5s ease;
+  }
+  
+  .refresh-btn:hover {
+    transform: rotate(180deg);
+  }
+  
+  .refresh-btn:active {
+    transform: rotate(360deg);
+  }

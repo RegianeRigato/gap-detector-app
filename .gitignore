@@ -1,0 +1,17 @@
+# Entorno virtual
+venv/
+
+# Archivos temporales de Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Archivos del sistema
+.DS_Store
+
+# Archivos sensibles
+.env
+
+# Base de datos local (si luego decides no subirla)
+# instance/users.db  ← descomenta si en el futuro quieres excluirla

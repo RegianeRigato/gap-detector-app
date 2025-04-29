@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analizador Avanzado de Gaps</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#0d6efd">
+    <link rel="apple-touch-icon" href="/static/icon-192.png">
+
+</head>
+
+<body>
+    <div class="container-fluid my-2 mx-2">
+        <div class="row">
+            <div class="col-12 custom-width mx-auto">
+                <div class="d-flex justify-content-end my-3">
+                    <button class="btn btn-outline-primary" onclick="logout()">Cerrar sesión</button>
+                </div>
+                <!-- Card de Búsqueda -->
+                <div class="card shadow-lg mb-4">
+                    <div class="card-header info-titulo text-white">
+                        <h3 class="mb-0"><i class="bi bi-graph-up"></i> Analizador de Gaps</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="stockForm" class="row g-3 align-items-end">
+                            <div class="col-md-3">
+                                <label for="ticker" class="form-label">Ticker</label>
+                                <input type="text" class="form-control" id="ticker" placeholder="Ej: AAPL, TSLA"
+                                    required>
+                            </div>
+                            <div class="col-md-2">
+                                <label for="minGap" class="form-label">Gap Mínimo (%)</label>
+                                <input type="number" class="form-control" id="minGap" min="0.1" step="0.1" value="20"
+                                    required>
+                            </div>
+                            <div class="col-md-2">
+                                <label for="minVolume" class="form-label">Vol. Mínimo</label>
+                                <input type="text" class="form-control" id="minVolume" value="1.000.000" required>
+                            </div>
+                            <div class="col-md-2">
+                                <label for="period" class="form-label">Período</label>
+                                <select class="form-select format-per" id="period" required>
+                                    <option value="1mo">1 Mes</option>
+                                    <option value="3mo">3 Meses</option>
+                                    <option value="6mo">6 Meses</option>
+                                    <option value="1y">1 Año</option>
+                                    <option value="2y">2 Años</option>
+                                    <option value="5y">5 Años</option>
+                                    <option value="max" selected>Máximo Histórico</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-check form-switch h-100 d-flex align-items-center">
+                                    <input class="form-check-input" type="checkbox" id="useExtended">
+                                    <label class="form-check-label ms-2" for="useExtended">Cierre Extendido</label>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-success w-100">
+                                    <i class="bi bi-lightning-charge"></i> Analizar
+                                </button>
+                            </div>
+                            <div class="col-md-2">
+                                <button class="btn btn-success w-100" id="resetAppBtn">
+                                    <i class="bi bi-arrow-clockwise me-1"></i> Limpiar
+                                </button>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Información de la Empresa -->
+                <div class="card shadow mb-4 fade-in" id="companyInfoCard" style="display:none;">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h4 id="companyName"></h4>
+                                <p class="mb-1"><strong>Sector:</strong> <span id="companySector"></span></p>
+                                <p class="mb-1"><strong>País:</strong> <span id="companyCountry"></span></p>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <button id="finviz-btn" class="btn btn-primary mt-2 w-btn-130">Finviz</button>
+                                <button id="dilutiontracker-btn" class="btn btn-success mt-2 w-btn-130">
+                                    D.Tracker</button>
+                            </div>
+                            <!-- descripcion  -->
+                            <div class="mt-3">
+                                <h6 class="mb-0 text-muted">Descripción
+                                    <button class="btn btn-sm btn-link text-primary" type="button"
+                                        data-bs-toggle="collapse" data-bs-target="#collapseDesc" aria-expanded="false"
+                                        aria-controls="collapseDesc">
+                                        <i class="bi bi-chevron-down"></i>
+                                    </button>
+                                </h6>
+                                <div class="collapse" id="collapseDesc">
+                                    <p id="companyDescription" class="text-muted mt-2 mb-0"></p>
+                                </div>
+                            </div>
+                            <!-- METRICAS personalizado: Float -->
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <!-- datos como nombre, sector, etc -->
+                                </div>
+                                <!-- Sección de METRICAS -->
+                                <div class="row mt-3">
+                                    <div class="col-md-2">
+                                        <div class="stat-card text-center">
+                                            <h6 class="text-muted"><i class="bi bi-currency-dollar"></i> Market Cap</h6>
+                                            <div class="stat-value" id="marketCapCard">Cargando...</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="stat-card text-center">
+                                            <h6 class="text-muted"><i class="bi bi-stack"></i> Float</h6>
+                                            <div class="stat-value" id="float-value">Cargando...</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="stat-card text-center">
+                                            <h6 class="text-muted"><i class="bi bi-person-badge"></i> Insider Own</h6>
+                                            <div class="stat-value" id="insiderOwn">Cargando...</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="stat-card text-center">
+                                            <h6 class="text-muted"><i class="bi bi-bank"></i> Institutional Own</h6>
+                                            <div class="stat-value" id="institutionalOwn">Cargando...</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="stat-card text-center">
+                                            <h6 class="text-muted"><i class="bi bi-arrow-down-circle"></i> Short
+                                                Interest</h6>
+                                            <div class="stat-value" id="shortInterest">Cargando...</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección Principal: Gráfico y Tabs -->
+                <div class="row mb-3">
+                    <!-- Gráfico Principal -->
+                    <div class="col-md-5">
+                        <div class="card shadow h-100">
+                            <div class="card-header bg-info text-white">
+                                <h5><i class="bi bi-graph-up"></i> Gráfico de Precios</h5>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="chart-container">
+                                    <canvas id="priceChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card con Tabs -->
+                    <div class="col-md-7">
+                        <div class="card shadow h-100">
+                            <div class="card-header bg-info text-white p-0">
+                                <ul class="nav nav-tabs" id="gapTabs" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" id="gaps-tab" data-bs-toggle="tab"
+                                            data-bs-target="#gaps-tab-pane" type="button" role="tab">
+                                            <i class="bi bi-table"></i> Gaps
+                                        </button>
+                                    </li>
+                                    <li class="nav-item text-white" role="presentation">
+                                        <button class="nav-link" id="stats-tab" data-bs-toggle="tab"
+                                            data-bs-target="#stats-tab-pane" type="button" role="tab">
+                                            <i class="bi bi-bar-chart"></i> Estadísticas
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="day2-tab" data-bs-toggle="tab"
+                                            data-bs-target="#day2-tab-pane" type="button" role="tab"
+                                            aria-controls="day2-tab-pane" aria-selected="false">
+                                            <i class="bi bi-calendar2"></i> Day 2
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="stats-day2-tab" data-bs-toggle="tab"
+                                            data-bs-target="#stats-day2-tab-pane" type="button" role="tab"
+                                            aria-controls="stats-day2-tab-pane" aria-selected="false">
+                                            <i class="bi bi-graph-up"></i> Estadísticas Day 2
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="compare-tab" data-bs-toggle="tab"
+                                            data-bs-target="#compare-tab-pane" type="button" role="tab"
+                                            aria-controls="compare-tab-pane" aria-selected="false">
+                                            <i class="bi bi-bar-chart"></i> 1D vs 2D
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="card-body tab-content" id="gapTabsContent"
+                                style="overflow-y: auto; max-height: 500px;">
+                                <!-- Tabla de Gaps -->
+                                <div class="tab-pane fade show active" id="gaps-tab-pane" role="tabpanel">
+                                    <table class="table table-hover" id="gapsTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Fecha</th>
+                                                <th>Dirección</th>
+                                                <th>Tamaño</th>
+                                                <th>Volumen Acc</th>
+                                                <th>Volumen $</th>
+                                                <th>High Spike</th>
+                                                <th>Low Spike</th>
+                                                <th>Change</th>
+                                                <th>Open</th>
+                                                <th>Close</th>
+                                                <th>Return</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="gapsTableBody"></tbody>
+                                    </table>
+                                </div>
+                                <!-- Day 2 -->
+                                <div class="tab-pane fade" id="day2-tab-pane" role="tabpanel" aria-labelledby="day2-tab"
+                                    tabindex="0">
+                                    <table class="table table-hover" id="day2Table">
+                                        <thead>
+                                            <tr>
+                                                <th>Fecha</th>
+                                                <th>Dirección</th>
+                                                <th>Tamaño</th>
+                                                <th>Volumen Acc</th>
+                                                <th>Volumen $</th>
+                                                <th>High Spike</th>
+                                                <th>Low Spike</th>
+                                                <th>Change</th>
+                                                <th>Open</th>
+                                                <th>Close</th>
+                                                <th>Return</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody id="day2TableBody"></tbody>
+                                    </table>
+                                </div>
+
+                                <!-- Estadísticas -->
+                                <div class="tab-pane fade" id="stats-tab-pane" role="tabpanel">
+                                    <div id="gapStatsContainer" class="px-3"></div>
+                                </div>
+                                <!-- Estadísticas Day 2-->
+                                <div class="tab-pane fade" id="stats-day2-tab-pane" role="tabpanel"
+                                    aria-labelledby="stats-day2-tab" tabindex="0">
+                                    <div id="day2StatsContainer" class="px-3"></div>
+                                </div>
+                                <!-- Comparativa day1 day2-->
+                                <div class="tab-pane fade" id="compare-tab-pane" role="tabpanel"
+                                    aria-labelledby="compare-tab" tabindex="0">
+                                    <div class="p-3">
+                                        <h6 class="text-muted"><i class="bi bi-bar-chart-line"></i> Comparativa Gap Day
+                                            vs Day 2</h6>
+                                        <canvas id="gapVsDay2Chart" style="max-height: 320px;"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Tradingview Widgets -->
+                <!-- Gráfico Avanzado y Perfil de la Compañía -->
+                <div class="row">
+                    <div class="col-md-8">
+                        <!-- Gráfico Avanzado -->
+                        <div class="card shadow h-100" style="height: auto">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0"><i class="bi bi-graph-up-arrow"></i> Gráfico Avanzado</h5>
+                            </div>
+                            <div class="card-body p-0">
+                                <div id="advanced-chart-widget" class="tradingview-widget-container"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <!-- Datos Fundamentales -->
+                        <div class="card shadow h-100">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0"><i class="bi bi-cash-stack"></i> Datos Fundamentales</h5>
+                            </div>
+                            <div class="card-body p-0">
+                                <div id="fundamental-data-widget" class="tradingview-widget-container"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer fade-in" style="animation-delay: 0.4s;">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-5 text-md-start">
+                    <p>&copy; 2025 Analizador de Gaps. Todos los derechos reservados.</p>
+                </div>
+                <div class="col-md-7 text-md-end">
+                    <p> <i class="bi bi-info-circle me-1"></i> Fuente de datos: Yahoo Finance y Tradingview Widgets. Uso
+                        exclusivamente informativo.</p>
+                </div>
+
+
+            </div>
+        </div>
+    </footer>
+    <!-- Alertas Flotantes -->
+    <div id="alertContainer" class="position-fixed top-0 end-0 p-3" style="z-index: 9999"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+    <!-- Dark Mode Toggle Button -->
+    <button class="btn btn-dark dark-mode-toggle rounded-circle p-2" id="darkModeToggle">
+        <i class="bi bi-moon-fill"></i>
+    </button>
+    <script>
+        async function logout() {
+            await fetch('/logout', { method: 'POST' });
+            window.location.href = '/login.html';
+        }
+    </script>
+
+    <script src="{{ url_for('static', filename='pwa.js') }}"></script>
+
+
+</body>
+
+</html>

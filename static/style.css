@@ -1,0 +1,716 @@
+/* Elimina márgenes y padding del cuerpo */
+body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden; /* Previene scroll horizontal */
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Ajusta el contenedor principal */
+.container-fluid {
+    width: 100%;
+    max-width: 100%;
+    padding-right: 0 !important;
+    padding-left: 0 !important;
+   
+}
+form{
+    font-family: monospace;
+}
+
+.custom-width {
+    width: 95%;
+    margin: 0 auto; /* Centrado */
+}
+/* Ajusta las tarjetas principales */
+.card {
+    border-radius: 12px;
+    border: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: 1.5rem;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+/* Ajusta específicamente el gráfico principal */
+.chart-container {
+    padding: 0;
+    margin: 0;
+}
+
+
+.info-titulo{
+    background-color: #3b2196;
+}
+
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+.chart-container {
+    position: relative;
+    height: 60vh;
+    width: 100%;
+}
+
+#priceChart {
+    /*background-color: white;
+    border-radius: 10px;*/
+    padding: 15px;
+}
+
+.gap-up {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.gap-down {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.alert-custom {
+    border-left: 5px solid;
+    border-radius: 8px;
+}
+
+.alert-success {
+    border-left-color: #28a745;
+}
+
+.alert-danger {
+    border-left-color: #dc3545;
+}
+
+#companyInfoCard {
+    background-color: #f3f3f3;
+    border-left: 5px solid #0d6efd;
+    border-right: 5px solid #0d6efd;
+}
+
+#gapDetailContainer, #gapStatsContainer {
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+}
+
+.table{
+    text-align: center;
+    font-size: 12px;
+}
+.table-hover tbody tr:hover {
+    background-color: rgba(13, 110, 253, 0.1);
+    cursor: pointer;
+  
+}
+
+/* Estadísticas de Gaps */
+.gap-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.stat-item {
+    background: white;
+    border-radius: 10px;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.stat-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0.3rem 0;
+}
+
+.stat-value small {
+    font-size: 1rem;
+    opacity: 0.8;
+}
+
+.progress {
+    background-color: #e9ecef;
+    border-radius: 4px;
+    height: 10px;
+}
+
+/* Detalle del Gap */
+.gap-detail {
+    flex: 1;
+}
+
+.gap-detail h5 {
+    color: #0d6efd;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.5rem;
+}
+
+.gap-detail p {
+    margin-bottom: 0.5rem;
+}
+
+.gap-detail canvas {
+    max-height: 200px;
+    width: 100% !important;
+}
+
+/* Price boxes */
+.price-box {
+    background: white;
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.price-box small {
+    display: block;
+    color: #6c757d;
+    font-size: 0.8rem;
+}
+
+.price-box .price {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0.3rem 0;
+}
+
+.price-box .price-change {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+/* Tabs */
+.nav-tabs .nav-link {
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 500;
+    padding: 1rem;
+}
+
+.nav-tabs .nav-link.active {
+    
+    color: white;
+    background-color: #0d6efd;
+    border-bottom: 3px solid #0526ff;
+}
+
+.nav-tabs {
+    font-size: 0.9rem;
+    border-bottom: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .chart-container {
+        height: 50vh;
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+    }
+}
+
+/* Backtesting */
+.performance-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.metric-card {
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.metric-label {
+    display: block;
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.metric-value {
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.bg-success-light {
+    background-color: rgba(40, 167, 69, 0.15);
+    border-left: 3px solid #28a745;
+}
+
+.bg-danger-light {
+    background-color: rgba(220, 53, 69, 0.15);
+    border-left: 3px solid #dc3545;
+}
+
+.bg-info-light {
+    background-color: rgba(23, 162, 184, 0.15);
+    border-left: 3px solid #17a2b8;
+}
+
+.strategy-result h3 {
+    font-weight: 800;
+}
+
+#returnsDistributionChart {
+    max-height: 250px;
+}
+
+/* Backtesting */
+#runBacktestBtn {
+    transition: all 0.3s;
+}
+
+#runBacktestBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.metric-card {
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.metric-card.bg-success-light {
+    background-color: rgba(40, 167, 69, 0.15);
+    border-left: 3px solid #28a745;
+}
+
+.metric-card.bg-danger-light {
+    background-color: rgba(220, 53, 69, 0.15);
+    border-left: 3px solid #dc3545;
+}
+
+.metric-card.bg-info-light {
+    background-color: rgba(23, 162, 184, 0.15);
+    border-left: 3px solid #17a2b8;
+}
+
+.metric-label {
+    display: block;
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.metric-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+#returnsChart {
+    max-height: 250px;
+}
+
+/* Estilo para el input de volumen */
+#minVolume {
+    font-family: monospace;
+    text-align: right;
+    border-left: 3px solid #0d6efd;
+}
+#ticker, #minGap, #minVolume{
+    font-family: monospace;
+    /*background-color: #f8f9fa;*/
+    border-left: 3px solid #0d6efd;
+}
+ .form-control,
+ .form-select {
+    background-color: #f8f9fa;
+}
+
+/* Indicador de formato */
+.form-label[for="minVolume"]::after {
+    content: " (ej: 1.000.000)";
+    font-size: 0.7rem;
+    opacity: 0.6;
+    font-style: italic;
+    display: inline;
+    margin-top: 2px;
+}
+
+#gapsTable th:nth-child(4), 
+#gapsTable td:nth-child(4) {
+    text-align: right;
+    font-family: monospace;
+}
+#float-value {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #0d6efd;
+}
+.stat-card {
+    background: white;
+    border-radius: 10px;
+    padding: 1rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    margin-bottom: 1rem;
+    transition: transform 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+.stat-card h6 {
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+}
+
+.stat-card .stat-value {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #0d6efd;
+}
+@media (max-width: 768px) {
+    .stat-card .stat-value {
+        font-size: 1.2rem;
+    }
+}
+
+#gapIntradayChart {
+    max-height: 200px;
+    width: 100%;
+    margin-top: 1rem;
+    background-color: white;
+    border-radius: 10px;
+    padding: 10px;
+}
+/* Añade al final de style.css */
+#backToMainChartBtn {
+    transition: all 0.3s;
+}
+
+#intradayChartContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    z-index: 10;
+    padding: 15px;
+}
+
+/* Estilos para el nuevo card de detalle */
+#gapDetailCard {
+    transition: all 0.3s ease;
+}
+
+#gapDetailCard .chart-container {
+    background-color: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+.chart-container {
+    position: relative;
+    width: 100%;
+    min-height: 400px;
+}
+
+#gapDetailCard {
+    transition: all 0.3s ease;
+}
+
+/* Estilos para el gráfico de barras */
+.bar-tooltip {
+    background-color: rgba(0, 0, 0, 0.8);
+    border-radius: 5px;
+    color: white;
+    padding: 10px;
+    pointer-events: none;
+}
+
+/* Estilos para el acordeón de sesiones */
+.accordion-button:not(.collapsed) {
+    background-color: rgba(13, 110, 253, 0.1);
+    color: #0d6efd;
+}
+
+.accordion-button:focus {
+    box-shadow: none;
+    border-color: rgba(0,0,0,.125);
+}
+
+/* Estilos para las estadísticas */
+#gapStatsDetail {
+    background-color: #f8f9fa;
+    height: 100%;
+}
+
+#gapStatsDetail h5 {
+    color: #0d6efd;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.stats-tile {
+    background-color: #fafafa; /* fondo oscuro */
+    border-radius: 10px;
+    padding: 0.8rem;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.stats-tile h6 {
+    font-size: 0.85rem;
+    color: #14024d; /* violeta claro */
+    margin-bottom: 0.5rem;
+}
+
+.stats-tile .stat-value {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #1d1d1d;
+}
+
+.stats-tile .stat-value.text-success {
+    color: #4dd784;
+}
+
+.stats-tile .stat-value.text-danger {
+    color: #f86c6b;
+}
+
+#collapseDesc {
+    transition: all 0.3s ease;
+}
+
+button[data-bs-toggle="collapse"] {
+    border: none;
+    background: none;
+    padding: 0;
+    font-size: 0.9rem;
+}
+button[data-bs-toggle="collapse"].collapsed i {
+    transform: rotate(0deg);
+    transition: transform 0.3s ease;
+}
+
+button[data-bs-toggle="collapse"]:not(.collapsed) i {
+    transform: rotate(180deg);
+}
+
+@media (max-width: 991px) {
+    #intradayGapCard .card-body {
+        flex-direction: column;
+    }
+}
+.selected-gap {
+    background-color: yellow !important;
+    border: 2px solid red !important;
+}
+#dilution {
+    background-color: #f3f3f3;
+    border-left: 5px solid #dc3545;
+    border-right: 5px solid #dc3545;
+    margin-top: 1rem;
+}
+
+#dilution pre {
+    background: #fff;
+    padding: 1rem;
+    border-radius: 8px;
+    white-space: pre-wrap;
+}
+
+/* Add this at the end of style.css */
+
+/* Dark Mode Base Styles */
+body.dark-mode {
+    background-color: #16191f;
+    color: #e0e0e0;
+}
+
+body.dark-mode #dilution,
+#dilution pre {
+    background-color: #182a55;
+
+}
+.w-btn-130 {
+    width: 130px;
+
+}
+
+/* Dark Mode Cards */
+body.dark-mode .card {
+    background-color: #181d27;
+    color: #e0e0e0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .card-header {
+    background-color: #182a55 !important;
+    border-bottom: 1px solid #333;
+}
+
+body.dark-mode #companyInfoCard {
+    background: linear-gradient(135deg, #182a55 0%, #181d27 100%);
+    border-left: 5px solid #3b2196;
+}
+
+body.dark-mode #ticker::placeholder {
+    color: #a0a0a0;
+}
+
+/* Dark Mode Tables */
+body.dark-mode .table {
+    color: #e0e0e0;
+    background-color: #181d27;
+}
+body.dark-mode .text-muted {
+    color: #e0e0e0 !important; 
+
+}
+
+body.dark-mode .table-hover tbody tr:hover {
+    background-color: rgba(13, 110, 253, 0.3) !important;
+}
+
+body.dark-mode .table th,
+body.dark-mode .table td {
+    border-color: #333;
+    background-color: #181d27;
+    color: #e0e0e0;
+}
+
+
+body.dark-mode .accordion-item, 
+body.dark-mode .stats-tile h6, 
+body.dark-mode .stats-tile .stat-value{
+    color: #e0e0e0;
+}
+
+body.dark-mode .price-box{
+    background-color: #182a55;
+}
+
+body.dark-mode #gapStatsDetail,
+body.dark-mode  #gapDetailCard .chart-container {
+    background-color: #181d27;
+
+}
+/* Dark Mode Form Elements */
+body.dark-mode #gapIntradayChart,
+body.dark-mode .stats-tile,
+body.dark-mode .form-control,
+body.dark-mode .form-select {
+    background-color: #182a55;
+    color: #e0e0e0;
+    border-color: #395597;
+}
+
+body.dark-mode .form-control:focus,
+body.dark-mode .form-select:focus {
+    background-color: #333;
+    color: #fff;
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Dark Mode Tabs */
+body.dark-mode .nav-tabs .nav-link {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+body.dark-mode .nav-tabs .nav-link.active {
+    background-color: #0d6efd;
+    color: white;
+}
+
+/* Dark Mode Stats Cards */
+body.dark-mode .stat-card {
+    background-color: #182a55;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .stat-card .stat-value {
+    color: #0d6efd;
+}
+
+/* Dark Mode Chart Backgrounds */
+body.dark-mode .chart-container {
+    background-color: #181d27;
+}
+
+/* Dark Mode Alerts */
+/* Dark Mode Accordion */
+body.dark-mode .accordion-item {
+    background-color: #181d27;
+    border-color: #333;
+}
+
+body.dark-mode .accordion-button {
+    background-color: #182a55;
+    color: #e0e0e0;
+}
+
+body.dark-mode .accordion-button:not(.collapsed) {
+    background-color: rgba(13, 110, 253, 0.2);
+    color: #0d6efd;
+}
+
+body.dark-mode .accordion-body {
+    background-color: #181d27;
+}
+
+/* Dark Mode Tooltips */
+body.dark-mode .tooltip {
+    --bs-tooltip-bg: #333;
+    --bs-tooltip-color: #fff;
+}
+
+/* Dark Mode Button */
+body.dark-mode .btn-outline-dark {
+    color: #e0e0e0;
+    border-color: #444;
+}
+
+body.dark-mode .btn-outline-dark:hover {
+    background-color: #333;
+    color: #fff;
+}
+
+/* Dark Mode Toggle Switch */
+.dark-mode-toggle {
+    position: fixed;
+    top: 14px;
+    left: 50px;
+    width: 40px;
+    z-index: 1000;
+}
+
+/* TradingView Widgets Dark Mode */
+body.dark-mode .tradingview-widget-container {
+    filter: invert(90%) hue-rotate(180deg);
+}

@@ -1,0 +1,217 @@
+:root {
+    --primary-color: #4361ee;
+    --secondary-color: #3f37c9;
+    --success-color: #4cc9f0;
+    --danger-color: #f72585;
+    --warning-color: #f8961e;
+    --info-color: #4895ef;
+    --light-color: #f8f9fa;
+    --dark-color: #212529;
+    --body-bg: #f5f7fb;
+    --card-bg: #ffffff;
+    --text-color: #212529;
+    --text-muted: #6c757d;
+  }
+
+  [data-bs-theme="dark"] {
+    --primary-color: #1d69ba;
+    --secondary-color: #3f37c9;
+    --body-bg: #16191f;
+    --card-bg: #16213e;
+    --text-color: #f8f9fa;
+    --text-muted: #adb5bd;
+  }
+
+  body {
+    background-color: var(--body-bg);
+    color: var(--text-color);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    transition: all 0.3s ease;
+  }
+
+  .main-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 0;
+  }
+  .brand-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    width: 100%;
+  }
+
+  .brand-title {
+    font-weight: 700;
+    background: linear-gradient(45deg, #4361ee, #4cc9f0);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .brand-subtitle {
+    color: var(--text-muted);
+    font-weight: 300;
+    margin-bottom: 2rem;
+  }
+
+  .login-container {
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .login-card {
+    width: 100%;
+    max-width: 400px;
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    background-color: var(--card-bg);
+    transition: all 0.3s ease;
+  }
+
+  .login-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+  }
+
+  .card-header {
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 12px 12px 0 0 !important;
+    padding: 1.5rem;
+    text-align: center;
+    border: none;
+  }
+
+  .card-body {
+    padding: 2rem;
+  }
+
+  .form-control {
+    border-radius: 8px;
+    padding: 12px 15px;
+    border: 1px solid #e0e0e0;
+    transition: all 0.3s ease;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+  }
+
+  .form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
+  }
+
+  .btn-login {
+    background-color: var(--primary-color);
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+
+  .btn-login:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-2px);
+  }
+
+  .theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.1);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 1000;
+  }
+
+  .theme-toggle:hover {
+    background: rgba(0, 0, 0, 0.2);
+  }
+
+  .footer {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    padding: 1.5rem;
+    text-align: center;
+    margin-top: auto;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .footer a {
+    color: var(--primary-color);
+    text-decoration: none;
+  }
+
+  .footer a:hover {
+    text-decoration: underline;
+  }
+
+  .input-group-text {
+    background-color: var(--card-bg);
+    border: 1px solid #e0e0e0;
+    color: var(--text-muted);
+  }
+
+  #msg {
+    min-height: 24px;
+  }
+
+  /* Animaciones */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .fade-in {
+    animation: fadeIn 0.6s ease forwards;
+  }
+
+  /* Notificaciones */
+  .notification {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100px);
+    min-width: 300px;
+    padding: 15px 20px;
+    border-radius: 10px;
+    color: white;
+    font-weight: 500;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    text-align: center;
+  }
+
+  .notification.show {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .notification.success {
+    background-color: var(--success-color);
+  }
+
+  .notification.error {
+    background-color: var(--danger-color);
+  }
+
+  .notification i {
+    margin-right: 10px;
+    font-size: 1.2rem;
+  }
