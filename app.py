@@ -8,7 +8,10 @@ import yfinance as yf
 from datetime import datetime, timedelta, time
 import pandas as pd
 import uuid
+import os
+from dotenv import load_dotenv
 
+load_dotenv()  # Carga variables de entorno desde .env
 
 app = Flask(__name__)
 
@@ -17,12 +20,21 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=60)
 
-app.secret_key = '9f8d7s6g5h4j3k2l1m0z9x8c7v6b5n4m'  
+# 🔐 Clave secreta para sesiones
+app.secret_key = os.getenv('SECRET_KEY', 'insecure-default-key')
 
+# 📬 Configuración del correo
+app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER')
+app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 587))
+app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', 'true').lower() in ['true', '1', 'yes']
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')
 
 # Inicializar extensiones
 db = SQLAlchemy(app)
 mail = Mail(app)
+
 
 
 # Modelo de usuario
@@ -60,6 +72,21 @@ def check_active_session(f):
 
         return f(*args, **kwargs)
     return decorated_function
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        user_id = session.get('user_id')
+        if not user_id:
+            return jsonify({'error': 'No autenticado'}), 401
+
+        user = User.query.get(user_id)
+        if not user or user.role != 'admin':
+            return jsonify({'error': 'Acceso no autorizado'}), 403
+
+        return f(*args, **kwargs)
+    return decorated_function
+
 
 # Rutas protegidas y autenticación
 @app.route('/')
@@ -424,6 +451,19 @@ def get_stock_data():
             'details': str(e),
             'traceback': traceback.format_exc()  # Solo para desarrollo, quitar en producción
         }), 500
+
+@app.route('/status')
+@check_active_session
+@admin_required
+def status():
+    return jsonify({
+        'status': 'ok',
+        'app': 'Gap Detector',
+        'env_secret_loaded': bool(os.getenv('SECRET_KEY')),
+        'mail_configured': bool(os.getenv('MAIL_USERNAME')) and bool(os.getenv('MAIL_PASSWORD')),
+        'environment': 'production' if not app.debug else 'development',
+        'session_active': 'user_id' in session
+    })
 
 
 
