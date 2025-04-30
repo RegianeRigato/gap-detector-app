@@ -36,8 +36,8 @@
                                 <input type="text" class="form-control" id="ticker" placeholder="Ej: AAPL, TSLA"
                                     required>
                             </div>
-                            <div class="col-md-2">
-                                <label for="minGap" class="form-label">Gap Mínimo (%)</label>
+                            <div class="col-md-1">
+                                <label for="minGap" class="form-label">Gap Mín. (%)</label>
                                 <input type="number" class="form-control" id="minGap" min="0.1" step="0.1" value="20"
                                     required>
                             </div>
@@ -57,12 +57,7 @@
                                     <option value="max" selected>Máximo Histórico</option>
                                 </select>
                             </div>
-                            <div class="col-md-2">
-                                <div class="form-check form-switch h-100 d-flex align-items-center">
-                                    <input class="form-check-input" type="checkbox" id="useExtended">
-                                    <label class="form-check-label ms-2" for="useExtended">Cierre Extendido</label>
-                                </div>
-                            </div>
+                           
                             <div class="col-md-2">
                                 <button type="submit" class="btn btn-success w-100">
                                     <i class="bi bi-lightning-charge"></i> Analizar
@@ -88,10 +83,11 @@
                                 <p class="mb-1"><strong>País:</strong> <span id="companyCountry"></span></p>
                             </div>
                             <div class="col-md-4 text-end">
-                                <button id="finviz-btn" class="btn btn-primary mt-2 w-btn-130">Finviz</button>
-                                <button id="dilutiontracker-btn" class="btn btn-success mt-2 w-btn-130">
-                                    D.Tracker</button>
+                                <button id="finviz-btn" class="btn btn-primary mt-2 w-btn-130" style="border: 1px solid #ffffff;">Finviz</button>
+                                <button id="dilutiontracker-btn" class="btn btn-dark mt-2 w-btn-130" style="border: 1px solid #ffffff;">D.Tracker</button>
+                                <button id="edgar-btn" class="btn btn-secondary mt-2 w-btn-130" style="border: 1px solid #ffffff;">Edgar</button>
                             </div>
+                            
                             <!-- descripcion  -->
                             <div class="mt-3">
                                 <h6 class="mb-0 text-muted">Descripción
@@ -120,30 +116,49 @@
                                     </div>
                                     <div class="col-md-2">
                                         <div class="stat-card text-center">
-                                            <h6 class="text-muted"><i class="bi bi-stack"></i> Float</h6>
+                                            <h6 class="text-muted">
+                                            <i class="bi bi-diagram-3"></i> Shares Outstanding
+                                            <i class="bi bi-info-circle text-secondary" data-bs-toggle="tooltip" title="Número total de acciones en circulación"></i>
+                                            </h6>
+                                            <div class="stat-value" id="sharesOutstanding">Cargando...</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-2">
+                                        <div class="stat-card text-center">
+                                            <h6 class="text-muted">
+                                                <i class="bi bi-stack"></i> Float
+                                                <i class="bi bi-info-circle text-secondary ms-1" data-bs-toggle="tooltip" title="Acciones disponibles para el público (no insiders)"></i>
+                                            </h6>
                                             <div class="stat-value" id="float-value">Cargando...</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-2">
+                                        <div class="stat-card text-center">
+                                            <h6 class="text-muted"><i class="bi bi-person-badge"></i> Insider Own
+                                                <i class="bi bi-info-circle text-secondary ms-1" data-bs-toggle="tooltip" title="Porcentaje de acciones en manos de ejecutivos o directores"></i>
+                                            </h6>
+                                            <div class="stat-value" id="insiderOwn">Cargando...</div>
                                         </div>
                                     </div>
                                     <div class="col-md-2">
                                         <div class="stat-card text-center">
-                                            <h6 class="text-muted"><i class="bi bi-person-badge"></i> Insider Own</h6>
-                                            <div class="stat-value" id="insiderOwn">Cargando...</div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="stat-card text-center">
-                                            <h6 class="text-muted"><i class="bi bi-bank"></i> Institutional Own</h6>
+                                            <h6 class="text-muted"><i class="bi bi-bank"></i> Institutional Own
+                                            <i class="bi bi-info-circle text-secondary ms-1" data-bs-toggle="tooltip" title="Porcentaje de acciones en manos de fondos e instituciones financieras"></i>                                            </h6>
                                             <div class="stat-value" id="institutionalOwn">Cargando...</div>
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-2">
                                         <div class="stat-card text-center">
-                                            <h6 class="text-muted"><i class="bi bi-arrow-down-circle"></i> Short
-                                                Interest</h6>
+                                            <h6 class="text-muted"><i class="bi bi-arrow-down-circle"></i> Short Interest
+                                            <i class="bi bi-info-circle text-secondary" data-bs-toggle="tooltip" title="Porcentaje de acciones en manos de ejecutivos o directores"></i>
+                                            </h6>
                                             <div class="stat-value" id="shortInterest">Cargando...</div>
                                         </div>
                                     </div>
                                 </div>
+                                <small style="font-size: xx-small;">Fuente: Yahoo Finance. - Fecha de actualización de los datos no disponible.</small>
                             </div>
 
                         </div>
@@ -214,15 +229,15 @@
                                             <tr>
                                                 <th>Fecha</th>
                                                 <th>Dirección</th>
-                                                <th>Tamaño</th>
+                                                <th>Tamaño <i class="bi bi-info-circle text-secondary" data-bs-toggle="tooltip" title="Porcentaje entre apertura y cierre anterior"></i></th>
                                                 <th>Volumen Acc</th>
                                                 <th>Volumen $</th>
-                                                <th>High Spike</th>
-                                                <th>Low Spike</th>
-                                                <th>Change</th>
+                                                <th>High Spike <i class="bi bi-info-circle text-secondary" data-bs-toggle="tooltip" title="Subida máxima intradía desde apertura"></i>  </th>
+                                                <th>Low Spike <i class="bi bi-info-circle text-secondary" data-bs-toggle="tooltip" title="Caída máxima intradía desde apertura"></i> </th>
+                                                <th>Change <i class="bi bi-info-circle text-secondary" data-bs-toggle="tooltip" title="Variación total desde cierre anterior hasta cierre actual"></i> </th>
                                                 <th>Open</th>
                                                 <th>Close</th>
-                                                <th>Return</th>
+                                                <th>Return <i class="bi bi-info-circle text-secondary" data-bs-toggle="tooltip" title="Variación intradía desde apertura hasta cierre"></i></th>
                                             </tr>
                                         </thead>
                                         <tbody id="gapsTableBody"></tbody>
@@ -236,15 +251,15 @@
                                             <tr>
                                                 <th>Fecha</th>
                                                 <th>Dirección</th>
-                                                <th>Tamaño</th>
+                                                <th>Tamaño <i class="bi bi-info-circle text-secondary" data-bs-toggle="tooltip" title="Porcentaje entre apertura y cierre anterior"></i></th>
                                                 <th>Volumen Acc</th>
                                                 <th>Volumen $</th>
-                                                <th>High Spike</th>
-                                                <th>Low Spike</th>
-                                                <th>Change</th>
+                                                <th>High Spike <i class="bi bi-info-circle text-secondary" data-bs-toggle="tooltip" title="Subida máxima intradía desde apertura"></i>  </th>
+                                                <th>Low Spike <i class="bi bi-info-circle text-secondary" data-bs-toggle="tooltip" title="Caída máxima intradía desde apertura"></i> </th>
+                                                <th>Change <i class="bi bi-info-circle text-secondary" data-bs-toggle="tooltip" title="Variación total desde cierre anterior hasta cierre actual"></i> </th>
                                                 <th>Open</th>
                                                 <th>Close</th>
-                                                <th>Return</th>
+                                                <th>Return <i class="bi bi-info-circle text-secondary" data-bs-toggle="tooltip" title="Variación intradía desde apertura hasta cierre"></i></th>
                                             </tr>
                                         </thead>
 

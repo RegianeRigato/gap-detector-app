@@ -392,7 +392,8 @@ def get_stock_data():
             'floatShares': "{:,.0f}".format(info.get('floatShares', 0)) if info.get('floatShares') else 'N/A',
             'insiderOwn': "{:.2f}%".format(info.get('heldPercentInsiders', 0) * 100) if info.get('heldPercentInsiders') else 'N/A',
             'institutionalOwn': "{:.2f}%".format(info.get('heldPercentInstitutions', 0) * 100) if info.get('heldPercentInstitutions') else 'N/A',
-            'shortInterest': "{:.2f}%".format(info.get('shortPercentOfFloat', 0) * 100) if info.get('shortPercentOfFloat') else 'N/A'
+            'shortInterest': "{:.2f}%".format(info.get('shortPercentOfFloat', 0) * 100) if info.get('shortPercentOfFloat') else 'N/A',
+            'sharesOutstanding': "{:,.0f}".format(info.get('sharesOutstanding', 0)) if info.get('sharesOutstanding') else 'N/A',
         }
 
         return jsonify({

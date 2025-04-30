@@ -56,6 +56,7 @@ document.getElementById('resetAppBtn').addEventListener('click', () => {
 
 
 document.addEventListener('DOMContentLoaded', function () {
+    activateTooltips(); // inicializa tooltips estáticos al cargar
     // Elementos del DOM
     const stockForm = document.getElementById('stockForm');
     const priceChartCtx = document.getElementById('priceChart').getContext('2d');
@@ -109,7 +110,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const minGap = parseFloat(document.getElementById('minGap').value);
         let minVolume = document.getElementById('minVolume').value.replace(/\./g, '');
         const period = document.getElementById('period').value;
-        const useExtended = document.getElementById('useExtended').checked;
 
         minVolume = parseFloat(minVolume);
         if (isNaN(minVolume) || minVolume <= 0) {
@@ -117,10 +117,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        showLoading(true);
-        console.log('Preparando fetch con:', ticker, minGap, minVolume, period, useExtended);
-
-        fetchStockData(ticker, minGap, minVolume, period, useExtended)
+        fetchStockData(ticker, minGap, minVolume, period)
             .catch(error => {
                 console.error('Error:', error);
                 showAlert(`Error al obtener datos: ${error.message}`, 'danger');
@@ -230,7 +227,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Función principal para obtener datos del mercado
-    async function fetchStockData(ticker, minGap, minVolume, period, useExtended) {
+    async function fetchStockData(ticker, minGap, minVolume, period) {
         showLoading(true);
 
         try {
@@ -243,7 +240,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     min_gap_percent: minGap,
                     min_volume: minVolume,
                     period: period,
-                    use_extended: useExtended
                 })
             });
 
@@ -291,14 +287,57 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('companySector').textContent = company.sector || 'N/A';
         //document.getElementById('avgVolume').textContent = company.avgVolume || 'N/A';
         document.getElementById('float-value').textContent = company.floatShares || 'N/A';
-        document.getElementById('insiderOwn').textContent = company.insiderOwn || 'N/A';
-        document.getElementById('institutionalOwn').textContent = company.institutionalOwn || 'N/A';
         document.getElementById('shortInterest').textContent = company.shortInterest || 'N/A';
         document.getElementById('marketCapCard').textContent = company.marketCap || 'N/A';
         document.getElementById('companyCountry').textContent = company.country || 'N/A';
         document.getElementById('companyDescription').textContent = company.description || 'N/A';
+        document.getElementById('sharesOutstanding').textContent = company.sharesOutstanding || 'N/A';
+        // INSIDER OWNERSHIP
+            const insiderValue = parseFloat(company.insiderOwn?.replace('%', '') || 0);
+            const insiderElem = document.getElementById('insiderOwn');
+            insiderElem.textContent = company.insiderOwn || 'N/A';
+            insiderElem.className = 'stat-value'; // limpia clases anteriores
 
-    
+            if (!isNaN(insiderValue)) {
+                if (insiderValue <= 25) {
+                    insiderElem.classList.add('text-success');
+                    insiderElem.setAttribute('data-bs-toggle', 'tooltip');
+                    insiderElem.setAttribute('title', 'Bajo nivel de participación de insiders');
+                } else if (insiderValue <= 50) {
+                    insiderElem.classList.add('text-warning');
+                    insiderElem.setAttribute('data-bs-toggle', 'tooltip');
+                    insiderElem.setAttribute('title', 'Moderado nivel de participación de insiders');
+                } else {
+                    insiderElem.classList.add('text-danger');
+                    insiderElem.setAttribute('data-bs-toggle', 'tooltip');
+                    insiderElem.setAttribute('title', 'Alto nivel de participación de insiders');
+                }
+            }
+
+            // INSTITUTIONAL OWNERSHIP
+            const institutionalValue = parseFloat(company.institutionalOwn?.replace('%', '') || 0);
+            const institutionalElem = document.getElementById('institutionalOwn');
+            institutionalElem.textContent = company.institutionalOwn || 'N/A';
+            institutionalElem.className = 'stat-value'; // limpia clases anteriores
+
+            if (!isNaN(institutionalValue)) {
+                institutionalElem.setAttribute('data-bs-toggle', 'tooltip');
+                if (institutionalValue >= 30) {
+                    institutionalElem.classList.add('text-danger');
+                    institutionalElem.setAttribute('title', 'Alta participación institucional');
+                } else {
+                    institutionalElem.classList.add('text-success');
+                    institutionalElem.setAttribute('title', 'Baja participación institucional');
+                }
+            }
+
+            // Activar tooltips
+            bootstrap.Tooltip.getInstance(insiderElem)?.dispose();
+            bootstrap.Tooltip.getInstance(institutionalElem)?.dispose();
+            new bootstrap.Tooltip(insiderElem);
+            new bootstrap.Tooltip(institutionalElem);  
+
+            activateTooltips(); 
 
     }
 
@@ -446,6 +485,7 @@ document.addEventListener('DOMContentLoaded', function () {
             `;
 
             gapsTableBody.appendChild(row);
+            activateTooltips();
         });
     }
 
@@ -996,7 +1036,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
-
+// BOTONES ENLACES A WEBS EXTERNAS
   document.getElementById('finviz-btn').addEventListener('click', function() {
     const ticker = document.getElementById('ticker').value.trim(); // Captura el ticker
     if (ticker) {
@@ -1016,4 +1056,20 @@ document.getElementById('dilutiontracker-btn').addEventListener('click', functio
         alert("Por favor ingrese un ticker.");
     }
 });
+
+document.getElementById('edgar-btn').addEventListener('click', function() {
+    const ticker = document.getElementById('ticker').value.trim(); // Captura el ticker
+    if (ticker) {
+        // Si hay un ticker, abrir el enlace de Edgar
+        window.open(`https://app.askedgar.io/ticker/${ticker}`, '_blank');
+    } else {
+        alert("Por favor ingrese un ticker.");
+    }
+});
+
+function activateTooltips() {
+    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+        new bootstrap.Tooltip(el);
+    });
+}
 
