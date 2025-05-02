@@ -92,6 +92,7 @@ function showNotification(type, message) {
         tableContent += `
             <tr class="fade-in">
                 <td>${u.id}</td>
+                <td>${u.created_at || 'N/A'}</td>
                 <td>${u.username}</td>
                 <td>${u.email}</td>
                 <td>
@@ -280,6 +281,11 @@ function showNotification(type, message) {
     $('#passwordMatch').hide();
     $('#confirmPassword').removeClass('is-invalid');
   });
+
+  const role = $('#newRole').val();
+if (role === 'prueba') {
+  showNotification('warning', 'Este usuario tendrá acceso solo durante 7 días');
+}
 
   // Cargar usuarios al iniciar
   $(document).ready(function() {

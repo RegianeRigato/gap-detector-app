@@ -65,6 +65,49 @@ document.addEventListener('DOMContentLoaded', function () {
     const alertContainer = document.getElementById('alertContainer');
     const runBacktestBtn = document.getElementById('runBacktestBtn');
     const backtestContainer = document.getElementById('backtestContainer');
+    const userRole = sessionStorage.getItem("userRole") || "user";
+
+    if (["intermedio", "vip"].includes(userRole)) {
+        const btnCalc = document.getElementById("btnCalculadora");
+        const playbook = document.getElementById("playbookSection");
+        if (playbook) playbook.style.display = "block";
+        if (btnCalc) btnCalc.style.display = "inline-block";
+      }
+    
+      if (userRole === "vip") {
+        const btnCalc = document.getElementById("btnCalculadora");
+        const btnBack = document.getElementById("btnBacktesting");
+        const playbook = document.getElementById("playbookSection");
+        if (playbook) playbook.style.display = "block";
+        if (btnCalc) btnCalc.style.display = "inline-block";
+        if (btnBack) btnBack.style.display = "inline-block";
+      }
+    
+      // Mostrar modal de Calculadora
+      const btnCalc = document.getElementById("btnCalculadora");
+      if (btnCalc) {
+        btnCalc.addEventListener("click", () => {
+          fetch("/calculadora")
+            .then(res => res.text())
+            .then(html => {
+              document.getElementById("modalContent").innerHTML = html;
+              new bootstrap.Modal(document.getElementById("utilModal")).show();
+            });
+        });
+      }
+    
+      // Mostrar modal de Backtesting
+      const btnBack = document.getElementById("btnBacktesting");
+      if (btnBack) {
+        btnBack.addEventListener("click", () => {
+          fetch("/backtesting")
+            .then(res => res.text())
+            .then(html => {
+              document.getElementById("modalContent").innerHTML = html;
+              new bootstrap.Modal(document.getElementById("utilModal")).show();
+            });
+        });
+      }
 
     // Variables de estado
 
@@ -91,7 +134,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // Inicializar el formato del volumen
     setupVolumeInput();
 
-    // Configurar formulario principal
     // Configurar formulario principal
     // Modificar el event listener del formulario
     stockForm.addEventListener('submit', function (e) {
@@ -339,6 +381,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
             activateTooltips(); 
 
+            if (userRole === "vip") {
+                document.getElementById("playbookSection").style.display = "block";
+                document.getElementById("playbookContent").innerHTML = `Análisis VIP para ${company.name}`;
+              }
+              
+
     }
 
 
@@ -516,7 +564,9 @@ document.addEventListener('DOMContentLoaded', function () {
     <div class="stats-grid mb-4">
         <div class="stats-tile">
             <h6>Total de Gaps</h6>
-            <div class="stat-value">${stats.total}</div>
+            <div class="stat-valuebig ${stats.total <= 4 ? 'text-danger' : stats.total <= 10 ? 'text-warning' : 'text-success'}">
+                ${stats.total}
+            </div>
         </div>
     </div>
 
@@ -544,7 +594,7 @@ document.addEventListener('DOMContentLoaded', function () {
             </div>
         </div>
     </div>
-`;
+  `;
 
 
         // Tarjetas con promedios
@@ -877,8 +927,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-  
-
 
 });
 
@@ -1073,3 +1121,48 @@ function activateTooltips() {
     });
 }
 
+function calcularPosicion() {
+    const riesgoInput = document.getElementById('riesgo');
+    const entradaInput = document.getElementById('entrada');
+    const stopInput = document.getElementById('stop');
+  
+    const riesgo = parseFloat(riesgoInput.value);
+    const entrada = parseFloat(entradaInput.value);
+    const stop = parseFloat(stopInput.value);
+  
+    // Reset classes
+    riesgoInput.classList.remove('is-invalid');
+    entradaInput.classList.remove('is-invalid');
+    stopInput.classList.remove('is-invalid');
+  
+    if (!riesgo || !entrada || !stop || entrada <= stop) {
+      if (!riesgo) riesgoInput.classList.add('is-invalid');
+      if (!entrada) entradaInput.classList.add('is-invalid');
+      if (!stop || entrada <= stop) stopInput.classList.add('is-invalid');
+  
+      document.getElementById('resultadoPosicion').innerHTML = '<div class="text-danger">Verifica los valores ingresados</div>';
+      return;
+    }
+  
+    const diferencia = entrada - stop;
+    const size = Math.floor(riesgo / diferencia);
+  
+    document.getElementById('resultadoPosicion').innerHTML = `
+      <div class="mb-2">Dif. E/S: <span style="color:rgb(44, 216, 25)"> $${diferencia.toFixed(2)}</span></div>
+      <div class="mb-2"><strong>Número de Size:</strong>
+      <strong style="color: #fd7e14;font-weight: bold;display:block;font-size:1.6rem">${size} acciones</strong> </div>
+    `;
+  }
+  
+  function limpiarPosicion() {
+    document.getElementById('riesgo').value = "10";
+    document.getElementById('entrada').value = "";
+    document.getElementById('stop').value = "";
+    document.getElementById('resultadoPosicion').innerHTML = "";
+  
+    document.getElementById('riesgo').classList.remove('is-invalid');
+    document.getElementById('entrada').classList.remove('is-invalid');
+    document.getElementById('stop').classList.remove('is-invalid');
+  }
+  
+  

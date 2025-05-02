@@ -18,7 +18,10 @@ body {
 form{
     font-family: monospace;
 }
-
+.model-center{
+    border-radius: 10px !important;
+    padding: 5px 20px;
+  }
 .custom-width {
     width: 95%;
     margin: 0 auto; /* Centrado */
@@ -132,6 +135,11 @@ form{
 
 .stat-value {
     font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0.3rem 0;
+}
+.stat-valuebig {
+    font-size: 2rem;
     font-weight: 700;
     margin: 0.3rem 0;
 }
@@ -558,7 +566,8 @@ body.dark-mode #dilution,
 
 }
 .w-btn-130 {
-    width: 130px;
+    width: 100px;
+    margin-right: 7px;
 
 }
 
@@ -579,7 +588,9 @@ body.dark-mode #companyInfoCard {
     border-left: 5px solid #3b2196;
 }
 
-body.dark-mode #ticker::placeholder {
+body.dark-mode #ticker::placeholder,
+body.dark-mode #entrada::placeholder,
+body.dark-mode #stop::placeholder {
     color: #a0a0a0;
 }
 

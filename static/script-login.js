@@ -67,35 +67,42 @@
 
   // Login form
   document.getElementById('loginForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const username = document.getElementById('username').value;
-  const password = document.getElementById('password').value;
-
-  const msg = document.getElementById('msg');
-  msg.innerHTML = '';
-
-  try {
-      const res = await fetch('/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password })
-      });
-
-      const data = await res.json();
-      if (res.ok) {
-          showNotification('success', 'Inicio de sesión exitoso');
-          setTimeout(() => {
-              if (data.role === 'admin') {
-                  window.location.href = '/admin.html';
-              } else {
-                  window.location.href = '/index.html';
-              }
-          }, 1000);
-      } else {
-          showNotification('error', data.error || 'Credenciales inválidas');
-      }
-  } catch (error) {
-      console.error('Error:', error);
-      showNotification('error', 'Error de conexión');
-  }
-});
+    e.preventDefault();
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+  
+    const msg = document.getElementById('msg');
+    msg.innerHTML = '';
+  
+    try {
+        const res = await fetch('/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+  
+        const data = await res.json();
+  
+        if (res.ok) {
+            // ✅ Guardar el rol inmediatamente
+            sessionStorage.setItem("userRole", data.role);
+  
+            showNotification('success', 'Inicio de sesión exitoso');
+  
+            setTimeout(() => {
+                if (data.role === 'admin') {
+                    window.location.href = '/admin.html';
+                } else {
+                    window.location.href = '/index.html';
+                }
+            }, 1000);
+  
+        } else {
+            showNotification('error', data.error || 'Credenciales inválidas');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showNotification('error', 'Error de conexión');
+    }
+  });
+  

@@ -71,18 +71,35 @@
 
                         </form>
                     </div>
+                    <div class="m-3 d-flex gap-2">
+                        <button class="btn btn-outline-primary" id="btnCalculadora" style="display:none;">
+                          <i class="bi bi-calculator"></i> Calculadora
+                        </button>
+                        <button class="btn btn-outline-success" id="btnBacktesting" style="display:none;">
+                          <i class="bi bi-graph-up-arrow"></i> Backtesting
+                        </button>
+                      </div>
+                      
                 </div>
 
                 <!-- Información de la Empresa -->
                 <div class="card shadow mb-4 fade-in" id="companyInfoCard" style="display:none;">
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-md-8">
+                            <div class="col-md-4">
                                 <h4 id="companyName"></h4>
                                 <p class="mb-1"><strong>Sector:</strong> <span id="companySector"></span></p>
                                 <p class="mb-1"><strong>País:</strong> <span id="companyCountry"></span></p>
                             </div>
-                            <div class="col-md-4 text-end">
+                            <!-- Playbook -->
+                            <div class="col-md-5">
+                                <div id="playbookSection" class="stat-card" style="display:none;">
+                                    <h5 class="text-primary"><i class="bi bi-journal-text me-1"></i> Playbook</h5>
+                                    <div id="playbookContent">Aquí se mostrará el playbook del ticker analizado.</div>
+                                  </div>
+                            </div>
+                            <!-- ENLACES WEBS EXTERNAS -->                         
+                            <div class="col-md-3 text-end">
                                 <button id="finviz-btn" class="btn btn-primary mt-2 w-btn-130" style="border: 1px solid #ffffff;">Finviz</button>
                                 <button id="dilutiontracker-btn" class="btn btn-dark mt-2 w-btn-130" style="border: 1px solid #ffffff;">D.Tracker</button>
                                 <button id="edgar-btn" class="btn btn-secondary mt-2 w-btn-130" style="border: 1px solid #ffffff;">Edgar</button>
@@ -338,6 +355,16 @@
     </footer>
     <!-- Alertas Flotantes -->
     <div id="alertContainer" class="position-fixed top-0 end-0 p-3" style="z-index: 9999"></div>
+
+    <!-- BACKTESTIN Y CALCULADORA -->
+    <div class="modal fade" id="utilModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable">
+          <div class="modal-content card-header model-center" id="modalContent">
+            <div class="modal-body text-center">Cargando...</div>
+          </div>
+        </div>
+      </div>
+      
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

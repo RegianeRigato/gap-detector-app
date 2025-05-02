@@ -35,24 +35,23 @@ app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')
 db = SQLAlchemy(app)
 mail = Mail(app)
 
-
-
 # Modelo de usuario
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password_hash = db.Column(db.String(120), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    role = db.Column(db.String(10), default='user')  # admin o user
+    role = db.Column(db.String(20), default='user')  # user, intermedio, vip, prueba
     is_active = db.Column(db.Boolean, default=True)
-    is_logged_in = db.Column(db.Boolean, default=False)  # Nuevo campo
-    session_id = db.Column(db.String(120))  # Nuevo campo para identificar sesión
-
+    is_logged_in = db.Column(db.Boolean, default=False)
+    session_id = db.Column(db.String(120))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)  # NUEVO
 
 from functools import wraps
 
 from flask import has_request_context
 
+# Decorador para validar sesiones y bloquear rol "prueba" tras 7 días
 def check_active_session(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -64,14 +63,35 @@ def check_active_session(f):
 
         if user_id:
             user = User.query.get(user_id)
-            # Si el user no está logueado o el ID de sesión no coincide
             if not user or not user.is_logged_in or user.session_id != session_id:
-                # Limpieza de seguridad
                 session.clear()
-                return jsonify({'error': 'Sesión inválida o expirada'}), 401
+                return jsonify({'error': 'Sesion invalida o expirada'}), 401
+
+            if user.role == 'prueba' and user.created_at + timedelta(days=7) < datetime.utcnow():
+                user.is_active = False
+                user.is_logged_in = False
+                user.session_id = None
+                db.session.commit()
+                session.clear()
+                return jsonify({'error': 'Tu periodo de prueba ha expirado'}), 403
 
         return f(*args, **kwargs)
     return decorated_function
+
+# Decorador para restringir rutas a ciertos roles
+def role_required(allowed_roles):
+    def decorator(f):
+        @wraps(f)
+        def wrapped(*args, **kwargs):
+            user_id = session.get('user_id')
+            if not user_id:
+                return jsonify({'error': 'No autenticado'}), 401
+            user = User.query.get(user_id)
+            if user.role not in allowed_roles:
+                return jsonify({'error': 'Acceso no autorizado'}), 403
+            return f(*args, **kwargs)
+        return wrapped
+    return decorator
 
 def admin_required(f):
     @wraps(f)
@@ -164,6 +184,7 @@ def login():
 
     return jsonify({
         'message': 'Login exitoso', 
+        'success': True,
         'role': user.role,
         'session_id': new_session_id
     })
@@ -192,7 +213,8 @@ def get_users():
             'email': u.email,
             'role': u.role,
             'is_active': u.is_active,
-            'is_logged_in': u.is_logged_in  # ✅ Ya está aquí
+            'is_logged_in': u.is_logged_in,
+            'created_at': u.created_at.strftime('%Y-%m-%d') if u.created_at else 'N/A'
         } for u in users
     ])
 
@@ -248,6 +270,18 @@ def force_logout_inactive():
     db.session.commit()
     return jsonify({'message': f'Sesiones limpiadas: {count}'})
 
+@app.route('/calculadora')
+@check_active_session
+@role_required(['intermedio', 'vip'])
+def calculadora():
+    return render_template('calculadora.html')
+
+@app.route('/backtesting')
+@check_active_session
+@role_required(['vip'])
+def backtesting():
+    return render_template('backtesting.html')
+
 
 # Funciones auxiliares para gaps
 # Función para obtener datos extendidos
@@ -283,7 +317,7 @@ def calculate_gap_stats(df, significant_gaps):
     }
     
     for idx, row in significant_gaps.iterrows():
-        if row['Close'] > row['Open']:
+        if row['Close']  >= row['Open']:
             stats['closed_above'] += 1
         elif row['Close'] < row['Open']:
             stats['closed_below'] += 1

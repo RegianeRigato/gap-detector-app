@@ -61,8 +61,12 @@
               <div class="form-floating">
                 <select id="newRole" class="form-select">
                   <option value="user" selected>Usuario</option>
+                  <option value="intermedio">Intermedio</option>
+                  <option value="vip">VIP</option>
+                  <option value="prueba">Prueba (7 días)</option>
                   <option value="admin">Administrador</option>
                 </select>
+                
                 <label for="newRole">Rol</label>
               </div>
             </div>
@@ -90,6 +94,7 @@
             <thead>
               <tr>
                 <th>ID</th>
+                <th>Fecha de alta</th>
                 <th>Usuario</th>
                 <th>Email</th>
                 <th>Rol</th>
@@ -102,6 +107,7 @@
               {% for u in users %}
               <tr>
                 <td>{{ u.id }}</td>
+                <td>{{ u.created_at.strftime('%Y-%m-%d') if u.created_at else 'N/A' }}</td>
                 <td>{{ u.username }}</td>
                 <td>{{ u.email }}</td>
                 <td>
