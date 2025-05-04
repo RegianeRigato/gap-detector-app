@@ -327,6 +327,139 @@ def calculate_gap_stats(df, significant_gaps):
     
     return stats
 
+# Endpoint detectar patrones para Playbook
+def detectar_patron_gap(gap, company, historical_data=None):
+    """
+    Detecta patrones de trading basados en gaps según los criterios de los PDFs.
+    
+    Args:
+        gap (dict): Datos del gap actual
+        company (dict): Datos fundamentales de la compañía
+        historical_data (dict, optional): Datos históricos para análisis de tendencia y volumen
+    
+    Returns:
+        list: Lista de patrones detectados
+    """
+    patrones = []
+
+    # Extraer y procesar datos básicos
+    float_shares = company.get("floatShares", 0)
+    short_interest = company.get("shortInterest", "0").replace('%', '')
+    insider_own = company.get("insiderOwn", "0").replace('%', '')
+    gap_pct = abs(gap.get("gap_percent", 0))
+    volume = gap.get("volume", 0)
+    prev_volume = gap.get("prev_volume", 0)  # Volumen del día anterior
+    dollar_volume = gap.get("dollar_volume", 0)
+    direction = gap.get("direction", "")
+    
+    # Cálculos de spikes y porcentajes
+    open_price = gap.get("open", 0)
+    high_price = gap.get("high", 0)
+    low_price = gap.get("low", 0)
+    close_price = gap.get("close", 0)
+    prev_close = gap.get("prev_close", 0)
+    pm_high = gap.get("pm_high", 0)  # High del premarket
+    vwap = gap.get("vwap", 0)  # VWAP actual
+    
+    high_spike = (high_price - open_price) / open_price * 100 if open_price else 0
+    low_spike = (low_price - open_price) / open_price * 100 if open_price else 0
+    
+    # Extensión desde el cierre anterior
+    extension_from_prev_close = (high_price - prev_close) / prev_close * 100 if prev_close else 0
+    
+    # Determinar si está bajo VWAP
+    below_vwap = close_price < vwap if vwap else False
+    
+    # Analizar si hay tendencia bajista (requiere historical_data)
+    bearish_trend = False
+    if historical_data and len(historical_data.get("closes", [])) > 10:
+        # Lógica simplificada: si ha estado bajando en los últimos 10 días
+        closes = historical_data["closes"][-10:]
+        if closes[0] > closes[-1]:
+            bearish_trend = True
+    
+    # Verificar si hay resistencia histórica significativa
+    has_resistance_above = False
+    resistance_level = 0
+    if historical_data:
+        # Lógica para detectar niveles de resistencia con volumen alto
+        # (Simplificado para el ejemplo)
+        has_resistance_above = historical_data.get("has_resistance_above", False)
+        resistance_level = historical_data.get("resistance_level", 0)
+    
+    # Comprobar la sobre extensión
+    is_overextended = extension_from_prev_close > 100  # Más del 100% desde el cierre anterior
+    
+    # Verificar volumen relativo al histórico
+    high_volume = volume > prev_volume * 1.5 if prev_volume else False
+    
+    try:
+        float_val = float(str(float_shares).replace(',', '').replace('.', ''))
+        short_val = float(short_interest)
+        insider_val = float(insider_own)
+    except:
+        float_val = 0
+        short_val = 0
+        insider_val = 0
+
+    # ----- PATRONES LARGOS -----
+
+    # Gap and Go
+    if (direction == 'up' and 
+        gap_pct >= 15 and 
+        gap_pct <= 50 and  # Sin sobre extensión excesiva
+        float_val < 30_000_000 and 
+        high_spike > 5 and
+        high_volume and
+        high_price > pm_high * 1.02):  # Breakout del PM high
+        patrones.append("Gap and Go")
+
+    # Gap and Crap Reversal
+    if (direction == 'up' and 
+        gap_pct >= 15 and 
+        float_val <= 15_000_000 and 
+        low_spike < -5 and  # Se pone roja
+        below_vwap and  # Por debajo de VWAP
+        high_volume and  # Volumen alto
+        extension_from_prev_close >= 30):  # Extensión desde close anterior
+        patrones.append("Gap and Crap Reversal")
+
+    # ----- PATRONES CORTOS -----
+
+    # Gap and Crap
+    if (direction == 'up' and 
+        gap_pct >= 10 and 
+        low_spike < -5 and  # Se pone roja
+        float_val <= 50_000_000 and
+        is_overextended):  # Sobre extendida
+        patrones.append("Gap and Crap")
+
+    # Gap and Extensión
+    if (direction == 'up' and 
+        is_overextended and  # Sobre extensión en premarket
+        high_price < pm_high * 0.98):  # Rechazo del PM high
+        patrones.append("Gap and Extensión")
+
+    # Over Extended Gap Down
+    if (direction == 'down' and 
+        gap_pct >= 10 and 
+        is_overextended and  # Sobre extensión previa
+        high_spike > 0 and high_spike < 10 and  # Bounce hacia el cierre
+        volume < prev_volume):  # Menos volumen que el día anterior
+        patrones.append("Over Extended Gap Down")
+
+    # Short Into Resistance
+    if (direction == 'up' and 
+        gap_pct >= 50 and 
+        bearish_trend and  # Tendencia bajista previa
+        has_resistance_above and  # Resistencia significativa por encima
+        high_price > resistance_level * 0.9):  # Acercándose a la resistencia
+        patrones.append("Short Into Resistance")
+
+    return patrones if patrones else []
+
+
+
 # Endpoint principal para datos del mercado
 @app.route('/get_stock_data', methods=['POST'])
 def get_stock_data():
@@ -457,6 +590,17 @@ def get_stock_data():
             'sharesOutstanding': "{:,.0f}".format(info.get('sharesOutstanding', 0)) if info.get('sharesOutstanding') else 'N/A',
         }
 
+        # Detectar patrón del gap más reciente si existe
+        if gaps_data:
+            patrones_detectados = detectar_patron_gap(gaps_data[0], company_info)
+        else:
+            patrones_detectados = []
+
+        # Si no hay ningún patrón, mostramos mensaje personalizado
+        playbooks_result = patrones_detectados if patrones_detectados else ["Ningún patrón identificado"]
+
+
+        # Construir la respuesta completa
         return jsonify({
             'dates': df.index.strftime('%Y-%m-%d').tolist(),
             'prices': {
@@ -471,11 +615,13 @@ def get_stock_data():
             'company': company_info,
             'gap_stats': calculate_gap_stats(df, significant_gaps),
             'extended_used': use_extended and extended_close is not None,
+            'playbooks': playbooks_result,  # Ahora es una lista vacía o con varios strings
             'data_range': {
                 'start_date': df.index.min().strftime('%Y-%m-%d'),
                 'end_date': df.index.max().strftime('%Y-%m-%d')
             }
         })
+
 
 
     except Exception as e:
@@ -498,9 +644,6 @@ def status():
         'environment': 'production' if not app.debug else 'development',
         'session_active': 'user_id' in session
     })
-
-
-
 
 
 if __name__ == '__main__':

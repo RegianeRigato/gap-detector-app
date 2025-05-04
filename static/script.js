@@ -8,6 +8,39 @@ let gapIntradayChart = null;
 let priceChart;
 let selectedGapRow = null;
 
+const patronesInfo = {
+    "Gap and Go": {
+      tipo: "📈 Largo",
+      descripcion: "Gap alcista ≥ 15% con catalizador, float bajo y sin sobrecarga de resistencia. Ideal cuando hay consolidación en premarket seguida de breakout con volumen creciente. Entrada óptima en el dip tras romper el high del premarket.",
+      enlace: "/static/img/gapandgo.png"
+    },
+    "Gap and Crap Reversal": {
+      tipo: "📈 Largo",
+      descripcion: "Acción que abre con gap up, se pone roja y cae por debajo de VWAP, pero forma un soporte sólido en vez de continuar cayendo. Requiere float bajo (<15M), volumen histórico alto y extensión previa >30%. Ofrece excelente R/R en el rebote.",
+      enlace: "/static/img/gapandcrap-reversal.png"
+    },
+    "Gap and Crap": {
+      tipo: "📉 Corto",
+      descripcion: "Acción sobreextendida en premarket que hace un push hacia el HOD en los primeros minutos tras la apertura, pero luego se desploma con vela roja de alto volumen. Ideal en acciones con fundamentales débiles y dilución. Puede convertirse en 'all day fader'.",
+      enlace: "/static/img/gapandcrap.png"
+    },
+    "Gap and Extensión": {
+      tipo: "📉 Corto",
+      descripcion: "Acción sobreextendida en premarket que rechaza el PM high claramente. Similar al Gap and Crap pero con entrada en 'front side' contra los niveles de premarket. Requiere disciplina con el riesgo y se confirma cuando el precio no logra superar el high del premarket.",
+      enlace: "/static/img/gapandextension.png"
+    },
+    "Over Extended Gap Down": {
+      tipo: "📉 Corto",
+      descripcion: "Acción sobreextendida (>100%) que hace gap down (>10%) tras período alcista. Bounce hacia el cierre anterior pero con volumen menor que día previo. Entrada ideal en el rebote hacia el cierre, cuando el volumen confirma debilidad.",
+      enlace: "/static/img/overextend.png"
+    },
+    "Short Into Resistance": {
+      tipo: "📉 Corto",
+      descripcion: "Acción con tendencia bajista que muestra corrida fuerte (>50%) hacia niveles de resistencia histórica con alto volumen. Entrada cerca de la resistencia cuando llega en un spike sin consolidación previa. Ideal cuando hay 'bag holders' esperando vender.",
+      enlace: "/static/img/shortintoresistence.png"
+    }
+  };  
+
 
 // Mostrar alertas
 function showAlert(message, type = 'info') {
@@ -109,6 +142,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
       }
 
+     
     // Variables de estado
 
     let currentData = {};
@@ -381,14 +415,61 @@ document.addEventListener('DOMContentLoaded', function () {
 
             activateTooltips(); 
 
-            if (userRole === "vip") {
+            if (userRole === "intermedio", "vip") {
+                const playbook = currentData.playbook || "Ningún patrón identificado";
                 document.getElementById("playbookSection").style.display = "block";
-                document.getElementById("playbookContent").innerHTML = `Análisis VIP para ${company.name}`;
-              }
+                const playbooks = currentData.playbooks || [];
+
+                const playbookContent = document.getElementById("playbookContent");
+                if (userRole === "intermedio", "vip") {
+                document.getElementById("playbookSection").style.display = "block";
+
+                if (playbooks.length === 1 && playbooks[0] === "Ningún patrón identificado") {
+                    playbookContent.innerHTML = `<span class="text-muted">Ningún patrón identificado.</span>`;
+                } else {
+                    playbookContent.innerHTML = playbooks.map(nombre => {
+                    const info = patronesInfo[nombre];
+                    if (!info) return "";
+
+                    return `
+                        <div class="mb-3 p-2 border rounded shadow-sm">
+                        <div class="fw-bold text-primary">${nombre} 
+                            <span class="badge ${info.tipo.includes('Largo') ? 'bg-success' : 'bg-danger'} ms-2">${info.tipo}</span>
+                        </div>
+                        <div class="fst-italic mb-2">${info.descripcion}</div>
+                        <button class="btn btn-sm btn-outline-info" onclick="abrirModalEjemplo('${info.enlace}')">Ver ejemplo visual</button>
+                        </div>
+                    `;
+                    }).join("");
+                }
+                }
+
+            }
+            
               
 
     }
 
+    // Renderizar playbook
+
+    function renderPlaybookDetalle(nombrePatron) {
+        const info = patronesInfo[nombrePatron];
+        const playbookContent = document.getElementById("playbookContent");
+      
+        if (!info) {
+          playbookContent.innerHTML = `<span class="text-muted">Ningún patrón identificado.</span>`;
+          return;
+        }
+      
+        playbookContent.innerHTML = `
+        <div class="mb-2"><strong>📘 Patrón Detectado:</strong> <span class="text-primary">${nombrePatron}</span></div>
+        <div class="mb-2"><em>${info.descripcion}</em></div>
+        <div>
+            <button class="btn btn-sm btn-outline-info" onclick="abrirModalEjemplo('${info.enlace}')">Ver ejemplo visual</button>
+        </div>
+        `;
+
+      }
 
     // Renderizar gráfico principal
     function renderChart(data) {
@@ -570,7 +651,7 @@ document.addEventListener('DOMContentLoaded', function () {
         </div>
     </div>
 
-    <div class="row g-3 mb-4">
+    <div class="row g-3 mb-2">
         <div class="col-md-6">
             <div class="stats-tile h-100">
                 <h6>Cierran por Encima</h6>
@@ -794,8 +875,6 @@ document.addEventListener('DOMContentLoaded', function () {
         `;
     }
 
-
-
     // Renderizar resultados de backtesting
     function renderBacktestResults(results) {
         if (!results || !results.summary || results.summary.total_trades === 0) {
@@ -926,7 +1005,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
-
+    
 
 });
 
@@ -1130,29 +1209,56 @@ function calcularPosicion() {
     const entrada = parseFloat(entradaInput.value);
     const stop = parseFloat(stopInput.value);
   
-    // Reset classes
+    // Reset clases de error
     riesgoInput.classList.remove('is-invalid');
     entradaInput.classList.remove('is-invalid');
     stopInput.classList.remove('is-invalid');
   
-    if (!riesgo || !entrada || !stop || entrada <= stop) {
-      if (!riesgo) riesgoInput.classList.add('is-invalid');
-      if (!entrada) entradaInput.classList.add('is-invalid');
-      if (!stop || entrada <= stop) stopInput.classList.add('is-invalid');
+    // Validaciones mínimas
+    let hayError = false;
+    if (isNaN(riesgo) || riesgo <= 0) {
+      riesgoInput.classList.add('is-invalid');
+      hayError = true;
+    }
+    if (isNaN(entrada)) {
+      entradaInput.classList.add('is-invalid');
+      hayError = true;
+    }
+    if (isNaN(stop)) {
+      stopInput.classList.add('is-invalid');
+      hayError = true;
+    }
   
+    if (hayError) {
       document.getElementById('resultadoPosicion').innerHTML = '<div class="text-danger">Verifica los valores ingresados</div>';
       return;
     }
   
     const diferencia = entrada - stop;
-    const size = Math.floor(riesgo / diferencia);
+  
+    if (diferencia === 0) {
+      stopInput.classList.add('is-invalid');
+      document.getElementById('resultadoPosicion').innerHTML = '<div class="text-danger">La diferencia entre entrada y stop no puede ser cero</div>';
+      return;
+    }
+  
+    const size = Math.floor(Math.abs(riesgo / diferencia));
+    const total = size * entrada;
+  
+    const esLarga = diferencia > 0;
+    const tipoPosicion = esLarga ? 'Posición Larga 📈' : 'Posición Corta 📉';
+    const colorPosicion = esLarga ? 'green' : 'red';
   
     document.getElementById('resultadoPosicion').innerHTML = `
-      <div class="mb-2">Dif. E/S: <span style="color:rgb(44, 216, 25)"> $${diferencia.toFixed(2)}</span></div>
+      <div class="mb-2" style="color:${colorPosicion}; font-weight:bold;">${tipoPosicion}</div>
+      <div class="mb-2">Riesgo por acción: <span style="color:rgb(44, 216, 25)"> $${diferencia.toFixed(2)}</span></div>
       <div class="mb-2"><strong>Número de Size:</strong>
-      <strong style="color: #fd7e14;font-weight: bold;display:block;font-size:1.6rem">${size} acciones</strong> </div>
+        <strong style="color: #fd7e14; font-weight: bold; display:block; font-size:1.6rem;">${size} acciones</strong>
+      </div>
+      <div class="mb-2">Importe Total de la Posición: : <strong style="color:write;font-size:1.4rem">$${total.toFixed(2)}</strong></div>
     `;
   }
+
   
   function limpiarPosicion() {
     document.getElementById('riesgo').value = "10";
@@ -1163,6 +1269,13 @@ function calcularPosicion() {
     document.getElementById('riesgo').classList.remove('is-invalid');
     document.getElementById('entrada').classList.remove('is-invalid');
     document.getElementById('stop').classList.remove('is-invalid');
+  }
+  
+  function abrirModalEjemplo(urlImagen) {
+    const modalBody = document.getElementById('modalEjemploVisualBody');
+    modalBody.innerHTML = `<img src="${urlImagen}" alt="Ejemplo visual" class="img-fluid rounded shadow">`;
+    const modal = new bootstrap.Modal(document.getElementById('modalEjemploVisual'));
+    modal.show();
   }
   
   

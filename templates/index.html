@@ -94,10 +94,20 @@
                             <!-- Playbook -->
                             <div class="col-md-5">
                                 <div id="playbookSection" class="stat-card" style="display:none;">
-                                    <h5 class="text-primary"><i class="bi bi-journal-text me-1"></i> Playbook</h5>
-                                    <div id="playbookContent">Aquí se mostrará el playbook del ticker analizado.</div>
+                                  <h5 class="text-primary d-flex justify-content-between align-items-center" style="cursor: pointer;" 
+                                      data-bs-toggle="collapse" data-bs-target="#playbookCollapse" aria-expanded="false" aria-controls="playbookCollapse">
+                                    <span style="color: rgb(237, 131, 56);"><i class="bi bi-journal-text me-1" ></i> Playbook</span>
+                                    <i class="bi bi-chevron-down" id="playbookToggleIcon"></i>
+                                  </h5>
+                              
+                                  <div class="collapse" id="playbookCollapse">
+                                    <div id="playbookContent" class="mt-2">
+                                      <!-- Aquí se insertan los patrones desde JS -->
+                                    </div>
                                   </div>
-                            </div>
+                                </div>
+                              </div>
+                              
                             <!-- ENLACES WEBS EXTERNAS -->                         
                             <div class="col-md-3 text-end">
                                 <button id="finviz-btn" class="btn btn-primary mt-2 w-btn-130" style="border: 1px solid #ffffff;">Finviz</button>
@@ -364,6 +374,22 @@
           </div>
         </div>
       </div>
+
+      <!-- Modal de Ejemplo Visual Playbook-->
+        <div class="modal fade" id="modalEjemploVisual" tabindex="-1" aria-labelledby="modalEjemploVisualLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content model-center card-header ">
+                <div class="modal-header">
+                <h5 class="modal-title" id="modalEjemploVisualLabel">Ejemplo del Patrón</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body" id="modalEjemploVisualBody" style="text-align:center">
+                <!-- Aquí irá el contenido dinámico -->
+                </div>
+            </div>
+            </div>
+        </div>
+  
       
 
     <!-- Scripts -->
